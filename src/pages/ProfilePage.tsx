@@ -1,10 +1,14 @@
 import Header from "@/components/Header";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Calendar, Heart, TrendingUp, Award, MapPin } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const donationData = [
   { name: "ก่อสร้าง", value: 15000, color: "#F7931E" },
@@ -47,6 +51,53 @@ const topTemples = [
 ];
 
 const ProfilePage = () => {
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const [editOpen, setEditOpen] = useState(false);
+  const [tempUrl, setTempUrl] = useState("");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("profile.avatarUrl");
+    if (saved) setAvatarUrl(saved);
+  }, []);
+
+  useEffect(() => {
+    if (avatarUrl) localStorage.setItem("profile.avatarUrl", avatarUrl);
+    else localStorage.removeItem("profile.avatarUrl");
+  }, [avatarUrl]);
+
+  const onFilePick: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result || "");
+      setTempUrl(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const normalizeAvatarUrl = (val: string) => {
+    const v = (val || "").trim();
+    if (!v) return "";
+    if (v.startsWith("data:")) return v; // file upload data URL
+    if (v.startsWith("http://") || v.startsWith("https://")) return v;
+    if (v.startsWith("public/")) return "/" + v.slice(7);
+    if (v.startsWith("images/")) return "/" + v; // ensure served from public/
+    if (v.startsWith("/")) return v;
+    return "/" + v; // fallback to root-relative
+  };
+
+  const applyAvatar = () => {
+    const normalized = normalizeAvatarUrl(tempUrl);
+    setAvatarUrl(normalized);
+    setEditOpen(false);
+  };
+
+  const clearAvatar = () => {
+    setTempUrl("");
+    setAvatarUrl("");
+  };
+
   const totalDonated = donationData.reduce((sum, item) => sum + item.value, 0);
   
   return (
@@ -59,6 +110,13 @@ const ProfilePage = () => {
           <CardContent className="p-6">
             <div className="flex items-start gap-6">
               <Avatar className="h-24 w-24">
+                {avatarUrl && (
+                  <AvatarImage
+                    src={avatarUrl}
+                    alt="Profile"
+                    onError={() => setAvatarUrl("")}
+                  />
+                )}
                 <AvatarFallback className="text-2xl bg-gradient-warm text-white">
                   สจ
                 </AvatarFallback>
@@ -67,14 +125,49 @@ const ProfilePage = () => {
               <div className="flex-1">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h1 className="text-2xl font-bold">สมชาย ใจบุญ</h1>
-                    <p className="text-muted-foreground">somchai@example.com</p>
+                    <h1 className="text-2xl font-bold">STO3 The gang</h1>
+                    <p className="text-muted-foreground">ST03@example.com</p>
                     <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
                       <Calendar className="h-4 w-4" />
                       <span>เข้าร่วมเมื่อ 1 ม.ค. 2568</span>
                     </div>
                   </div>
-                  <Button variant="outline">แก้ไขโปรไฟล์</Button>
+                  <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" onClick={() => { setTempUrl(avatarUrl); }}>แก้ไขโปรไฟล์</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>เปลี่ยนรูปโปรไฟล์</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="avatarUrl">ลิงก์รูปภาพ (URL)</Label>
+                          <Input id="avatarUrl" placeholder="/images/profile.jpg" value={tempUrl} onChange={(e) => setTempUrl(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="avatarFile">หรืออัปโหลดไฟล์</Label>
+                          <Input id="avatarFile" type="file" accept="image/*" onChange={onFilePick} />
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-sm text-muted-foreground">ตัวอย่าง:</div>
+                          <div className="h-16 w-16 rounded-full overflow-hidden border">
+                            {tempUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={tempUrl} alt="preview" className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="h-full w-full flex items-center justify-center text-xs text-muted-foreground">ไม่มีรูป</div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <DialogFooter className="gap-2">
+                        <Button variant="secondary" onClick={clearAvatar}>ล้างรูป</Button>
+                        <Button variant="outline" onClick={() => setEditOpen(false)}>ยกเลิก</Button>
+                        <Button onClick={applyAvatar} disabled={!tempUrl}>บันทึก</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
                 
                 <div className="flex gap-3 mt-4">

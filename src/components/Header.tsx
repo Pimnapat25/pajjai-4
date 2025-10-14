@@ -9,8 +9,8 @@ const Header = () => {
   
   const navItems = [
     { path: "/", icon: Home, label: "หน้าหลัก" },
-    { path: "/projects", icon: HandHeart, label: "โครงการ" },
-    { path: "/temples", icon: ListCollapse, label: "วัดทั้งหมด" },
+  { path: "/temples", icon: ListCollapse, label: "วัดทั้งหมด" },
+  { path: "/projects", icon: HandHeart, label: "โครงการ" },
     { path: "/fund", icon: HandHeart, label: "กองทุนรวม" },
     { path: "/profile", icon: User, label: "บัญชี" },
   ];
