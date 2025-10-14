@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Heart, Home, ListCollapse, FolderHeart, User } from "lucide-react";
+import { Church, Home, ListCollapse, HandHeart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Header = () => {
@@ -9,9 +9,9 @@ const Header = () => {
   
   const navItems = [
     { path: "/", icon: Home, label: "หน้าหลัก" },
-    { path: "/projects", icon: FolderHeart, label: "โครงการ" },
+    { path: "/projects", icon: HandHeart, label: "โครงการ" },
     { path: "/temples", icon: ListCollapse, label: "วัดทั้งหมด" },
-    { path: "/fund", icon: Heart, label: "กองทุนรวม" },
+    { path: "/fund", icon: HandHeart, label: "กองทุนรวม" },
     { path: "/profile", icon: User, label: "บัญชี" },
   ];
   
@@ -20,7 +20,7 @@ const Header = () => {
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-full gradient-warm">
-            <Heart className="h-5 w-5 text-primary-foreground" fill="currentColor" />
+            <Church className="h-5 w-5 text-primary-foreground" />
           </div>
           <div className="hidden sm:block">
             <h1 className="text-xl font-bold text-primary">ปัจจัย 4.0</h1>

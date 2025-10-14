@@ -1,56 +1,12 @@
-import { useState } from "react";
 import Header from "@/components/Header";
 import StatCard from "@/components/StatCard";
-import TempleCard from "@/components/TempleCard";
-import CategoryTabs from "@/components/CategoryTabs";
 import DonationChart from "@/components/DonationChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { DollarSign, Users, TrendingUp, Heart } from "lucide-react";
+import { DollarSign, Users, TrendingUp, HandHeart } from "lucide-react";
 
 const Index = () => {
-  const [activeCategory, setActiveCategory] = useState("all");
-  
-  const temples = [
-    {
-      id: "1",
-      name: "วัดพระธาตุดอยสุเทพราชวรวิหาร",
-      location: "เชียงใหม่",
-      image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80",
-      raised: 245000,
-      goal: 500000,
-      category: "ก่อสร้าง",
-    },
-    {
-      id: "2",
-      name: "วัดโพธิ์",
-      location: "กรุงเทพมหานคร",
-      image: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80",
-      raised: 180000,
-      goal: 300000,
-      category: "ค่าน้ำไฟ",
-    },
-    {
-      id: "3",
-      name: "วัดอรุณราชวราราม",
-      location: "กรุงเทพมหานคร",
-      image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&q=80",
-      raised: 120000,
-      goal: 400000,
-      category: "ถวายอาหาร",
-    },
-    {
-      id: "4",
-      name: "วัดพระแก้ว",
-      location: "กรุงเทพมหานคร",
-      image: "https://images.unsplash.com/photo-1583204233708-cb5ab08ee3d3?w=800&q=80",
-      raised: 85000,
-      goal: 250000,
-      category: "การศึกษา",
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -94,7 +50,7 @@ const Index = () => {
           <Card className="shadow-medium">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Heart className="h-5 w-5 text-primary" />
+                <HandHeart className="h-5 w-5 text-primary" />
                 สัดส่วนหมวดบริจาค
               </CardTitle>
             </CardHeader>
@@ -115,7 +71,7 @@ const Index = () => {
                     ช่วยเหลือวัดที่มีความต้องการเร่งด่วน
                   </p>
                 </div>
-                <Heart className="h-12 w-12 text-white/30" fill="currentColor" />
+                <HandHeart className="h-12 w-12 text-white/30" fill="currentColor" />
               </div>
               
               <div className="space-y-2">
@@ -144,50 +100,6 @@ const Index = () => {
           </Card>
         </section>
 
-        {/* Recommended Temples */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-2xl font-bold text-foreground">
-                วัดที่ควรให้ความช่วยเหลือ
-              </h3>
-              <p className="text-muted-foreground mt-1">
-                วัดที่มีความต้องการบริจาคมากที่สุด
-              </p>
-            </div>
-          </div>
-          
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {temples.map((temple) => (
-              <TempleCard key={temple.id} {...temple} />
-            ))}
-          </div>
-        </section>
-
-        {/* Category Section */}
-        <section className="space-y-6">
-          <div>
-            <h3 className="text-2xl font-bold text-foreground">
-              เลือกตามหมวดหมู่
-            </h3>
-            <p className="text-muted-foreground mt-1">
-              บริจาคตามหมวดที่คุณสนใจ
-            </p>
-          </div>
-          
-          <CategoryTabs 
-            activeCategory={activeCategory} 
-            onCategoryChange={setActiveCategory}
-          />
-          
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {temples
-              .filter(t => activeCategory === "all" || t.category === activeCategory)
-              .map((temple) => (
-                <TempleCard key={temple.id} {...temple} />
-              ))}
-          </div>
-        </section>
       </main>
       
       <footer className="border-t bg-card py-8 mt-16">
