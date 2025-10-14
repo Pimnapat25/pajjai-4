@@ -4,14 +4,14 @@ import DonationChart from "@/components/DonationChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { DollarSign, Users, TrendingUp, HandHeart } from "lucide-react";
+import { DollarSign, Users, TrendingUp, HandHeart, PiggyBank } from "lucide-react";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container py-8 space-y-12">
+  <main className="container py-6 sm:py-8 space-y-10 sm:space-y-12">
         {/* Hero Stats Section */}
         <section className="space-y-6">
           <div className="text-center space-y-2">
@@ -63,15 +63,15 @@ const Index = () => {
         {/* Community Fund */}
         <section>
           <Card className="shadow-medium gradient-warm text-white">
-            <CardContent className="p-6 space-y-4">
-              <div className="flex items-center justify-between">
+            <CardContent className="p-5 sm:p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-2xl font-bold">กองทุนรวมเพื่อวัดที่ขาดแคลน</h3>
-                  <p className="text-white/90 mt-1">
+                  <h3 className="text-xl sm:text-2xl font-bold">กองทุนรวมเพื่อวัดที่ขาดแคลน</h3>
+                  <p className="text-white/90 mt-1 text-sm sm:text-base">
                     ช่วยเหลือวัดที่มีความต้องการเร่งด่วน
                   </p>
                 </div>
-                <HandHeart className="h-12 w-12 text-white/30" fill="currentColor" />
+                <PiggyBank className="h-10 w-10 sm:h-12 sm:w-12 text-white/30" />
               </div>
               
               <div className="space-y-2">
@@ -82,17 +82,17 @@ const Index = () => {
                 <Progress value={47.52} className="h-3 bg-white/30" />
               </div>
               
-              <div className="flex gap-3">
-                <Button variant="secondary" size="sm" className="flex-1">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
+                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]">
                   ฿100
                 </Button>
-                <Button variant="secondary" size="sm" className="flex-1">
+                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]">
                   ฿300
                 </Button>
-                <Button variant="secondary" size="sm" className="flex-1">
+                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]">
                   ฿500
                 </Button>
-                <Button variant="secondary" size="sm" className="flex-1">
+                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]">
                   จำนวนอื่น
                 </Button>
               </div>

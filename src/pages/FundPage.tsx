@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { Lightbulb, Droplets, UtensilsCrossed, BookOpen, HandHeart } from "lucide-react";
+import { Lightbulb, Droplets, UtensilsCrossed, BookOpen, PiggyBank } from "lucide-react";
 
 const FundPage = () => {
   const [customAmount, setCustomAmount] = useState("");
@@ -61,24 +61,24 @@ const FundPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container py-8 space-y-8">
+      <main className="container py-6 sm:py-8 space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">กองทุนรวมเพื่อวัดที่ขาดแคลน</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground break-words">กองทุนรวมเพื่อวัดที่ขาดแคลน</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             ช่วยเหลือวัดที่มีความต้องการเร่งด่วน โดยระบบจะจัดสรรเงินให้วัดที่ต้องการมากที่สุด
           </p>
         </div>
 
         <Card className="shadow-medium gradient-warm text-white">
-          <CardContent className="p-8 space-y-6">
-            <div className="flex items-center justify-between">
+          <CardContent className="p-6 sm:p-8 space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-3xl font-bold">ยอดบริจาครวม</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold">ยอดบริจาครวม</h2>
                 <p className="text-white/90 mt-1">
                   จากผู้มีจิตศรัทธาทั่วประเทศ
                 </p>
               </div>
-              <HandHeart className="h-16 w-16 text-white/30" fill="currentColor" />
+              <PiggyBank className="h-14 w-14 sm:h-16 sm:w-16 text-white/30" />
             </div>
             
             <div className="space-y-2">
@@ -95,8 +95,8 @@ const FundPage = () => {
         </Card>
 
         <div>
-          <h2 className="text-2xl font-bold text-foreground mb-4">เลือกหมวดที่ต้องการบริจาค</h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">เลือกหมวดที่ต้องการบริจาค</h2>
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
             {categories.map((category) => {
               const Icon = category.icon;
               const progress = (category.raised / category.goal) * 100;
@@ -111,9 +111,9 @@ const FundPage = () => {
                   onClick={() => setSelectedCategory(isSelected ? null : category.id)}
                 >
                   <CardHeader className={`${category.bgColor} pb-4`}>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">{category.name}</CardTitle>
-                      <Icon className={`h-8 w-8 ${category.color}`} />
+                    <div className="flex items-start sm:items-center justify-between gap-2">
+                      <CardTitle className="text-base sm:text-lg">{category.name}</CardTitle>
+                      <Icon className={`h-6 w-6 sm:h-8 sm:w-8 ${category.color}`} />
                     </div>
                   </CardHeader>
                   
@@ -145,7 +145,7 @@ const FundPage = () => {
           </div>
         </div>
 
-        <Card className="shadow-medium">
+    <Card className="shadow-medium">
           <CardHeader>
             <CardTitle>เลือกจำนวนเงินที่บริจาค</CardTitle>
             {selectedCategory && (
@@ -169,19 +169,19 @@ const FundPage = () => {
               ))}
             </div>
             
-            <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
               <Input
                 type="number"
                 placeholder="จำนวนเงินอื่นๆ"
                 value={customAmount}
                 onChange={(e) => setCustomAmount(e.target.value)}
-                className="flex-1 h-12 text-lg"
+        className="flex-1 h-12 text-lg w-full"
               />
               <Button
                 size="lg"
                 onClick={() => handleDonate(Number(customAmount))}
                 disabled={!customAmount || Number(customAmount) <= 0}
-                className="gradient-warm border-0 text-white px-8"
+        className="gradient-warm border-0 text-white px-8 w-full sm:w-auto"
               >
                 บริจาค
               </Button>

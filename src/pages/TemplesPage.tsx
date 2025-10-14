@@ -96,8 +96,8 @@ const TemplesPage = () => {
                   <div className="space-y-3">
                     {temple.neededItems.map((item) => (
                       <div key={item.id} className="p-4 rounded-md border bg-muted/30">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="space-y-2">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+                          <div className="space-y-2 flex-1">
                             <div className="flex items-center gap-2">
                               <h4 className="font-medium">{item.name}</h4>
                               <Badge variant="secondary">เหลือ {item.remaining}/{item.quantity}</Badge>
@@ -111,8 +111,8 @@ const TemplesPage = () => {
                               ))}
                             </div>
                           </div>
-                          <Link to={`/temple/${temple.id}?items=${encodeURIComponent(item.name)}`}>
-                            <Button size="sm" className="whitespace-nowrap">เพิ่มไปยังร่วมสมทบทุน</Button>
+                          <Link to={`/temple/${temple.id}?items=${encodeURIComponent(item.name)}`} className="sm:self-start">
+                            <Button size="sm" className="w-full sm:w-auto whitespace-nowrap">เพิ่มไปยังร่วมสมทบทุน</Button>
                           </Link>
                         </div>
                       </div>
