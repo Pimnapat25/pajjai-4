@@ -21,7 +21,7 @@ export const templesData: Temple[] = [
     id: "1",
     name: "วัดพระธาตุดอยสุเทพราชวรวิหาร",
     location: "เชียงใหม่",
-    image: "public/images/Wat_Phra_That_Doi_Suthep_(I).jpg",
+  image: "/images/Wat_Phra_That_Doi_Suthep_(I).jpg",
     raised: 245000,
     goal: 500000,
     neededItems: [
@@ -63,7 +63,7 @@ export const templesData: Temple[] = [
     id: "4",
     name: "วัดหัวลำโพง",
     location: "เชียงใหม่",
-    image: "public/images/Wat_Hua_Lamphong_Bangkok.jpg",
+  image: "/images/Wat_Hua_Lamphong_Bangkok.jpg",
     raised: 95000,
     goal: 220000,
     neededItems: [
@@ -77,7 +77,7 @@ export const templesData: Temple[] = [
     id: "5",
     name: "วัดมหาธาตุยุวราชรังสฤษฎิ์",
     location: "กรุงเทพมหานคร",
-    image: "public/images/พระอุโบสถ_พระวิหาร_พระมณฑป_วัดมหาธาตุยุวราชรังสฤษฎิ์.jpg",
+  image: "/images/พระอุโบสถ_พระวิหาร_พระมณฑป_วัดมหาธาตุยุวราชรังสฤษฎิ์.jpg",
     raised: 140000,
     goal: 350000,
     neededItems: [

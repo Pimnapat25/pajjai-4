@@ -114,7 +114,7 @@ const ProfilePage = () => {
                   <AvatarImage
                     src={avatarUrl}
                     alt="Profile"
-                    onError={() => setAvatarUrl("")}
+                    onError={() => setAvatarUrl("/images/profile.jpg")}
                   />
                 )}
                 <AvatarFallback className="text-2xl bg-gradient-warm text-white">
