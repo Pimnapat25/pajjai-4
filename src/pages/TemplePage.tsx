@@ -151,7 +151,7 @@ const TemplePage = () => {
           </Button>
         </div>
         {/* Temple Header */}
-        <div className="relative h-96 rounded-2xl overflow-hidden shadow-medium">
+  <div className="relative h-56 sm:h-72 md:h-80 lg:h-96 rounded-2xl overflow-hidden shadow-medium">
           <img
             src={meta.image}
             alt={meta.name}
@@ -162,10 +162,10 @@ const TemplePage = () => {
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-            <div className="flex items-start justify-between">
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 lg:p-8 text-white">
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
               <div className="space-y-2">
-                <h1 className="text-4xl font-bold">{meta.name}</h1>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{meta.name}</h1>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
                   <span>{meta.location}</span>
@@ -175,7 +175,7 @@ const TemplePage = () => {
                   ได้รับการรองรับจากกรมการศาสนา
                 </Badge>
               </div>
-              <Button variant="secondary" size="sm" className="gap-2">
+              <Button variant="secondary" size="sm" className="gap-2 self-start sm:self-auto">
                 <Share2 className="h-4 w-4" />
                 แชร์
               </Button>
@@ -276,7 +276,7 @@ const TemplePage = () => {
 
           {/* Right Column - Donation Card */}
           <div className="lg:col-span-1">
-            <Card className="shadow-medium sticky top-24">
+            <Card className="shadow-medium lg:sticky lg:top-24">
               <CardHeader>
                 <CardTitle>ร่วมสมทบทุน</CardTitle>
               </CardHeader>
@@ -289,12 +289,12 @@ const TemplePage = () => {
                   ) : (
                     <div className="space-y-2">
                       {Object.entries(cart).map(([name, qty]) => (
-                        <div key={name} className="flex items-center justify-between gap-2">
-                          <span className="text-sm">{name}</span>
-                          <div className="flex items-center gap-2">
+                        <div key={name} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <span className="text-sm break-words max-w-full sm:max-w-[50%]">{name}</span>
+                          <div className="flex items-center gap-2 sm:self-auto">
                             <input
                               type="number"
-                              className="w-20 px-3 py-1 border rounded"
+                              className="w-24 px-3 py-1 border rounded"
                               min={0}
                               max={getRemaining(name)}
                               value={qty}

@@ -25,7 +25,7 @@ const TemplesPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container py-8 space-y-8">
+  <main className="container py-6 sm:py-8 space-y-6 sm:space-y-8">
         <div className="space-y-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">วัดทั้งหมด</h1>
@@ -34,7 +34,7 @@ const TemplesPage = () => {
             </p>
           </div>
           
-          <div className="relative max-w-md">
+    <div className="relative w-full sm:max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="ค้นหาวัด..."
@@ -45,10 +45,10 @@ const TemplesPage = () => {
           </div>
         </div>
 
-  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+  <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {filteredTemples.map((temple) => (
             <Card key={temple.id} className="overflow-hidden hover:shadow-medium transition-smooth group">
-              <div className="relative h-56 overflow-hidden">
+        <div className="relative h-44 sm:h-52 md:h-56 overflow-hidden">
                 <img
                   src={temple.image}
                   alt={temple.name}
@@ -63,7 +63,7 @@ const TemplesPage = () => {
                 </div>
               </div>
 
-              <CardContent className="p-6 space-y-5">
+        <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-5">
                 <div>
                   <Link to={`/temple/${temple.id}`}>
                     <h2 className="text-xl font-semibold text-foreground hover:text-primary transition-colors line-clamp-1">

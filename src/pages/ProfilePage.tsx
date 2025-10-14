@@ -104,7 +104,7 @@ const ProfilePage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container py-8 space-y-8">
+  <main className="container py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Profile Header */}
         <Card className="shadow-medium">
           <CardContent className="p-6">
@@ -196,7 +196,7 @@ const ProfilePage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
                   <div>
                     <div className="text-3xl font-bold text-primary">
                       ฿{totalDonated.toLocaleString()}
@@ -206,7 +206,7 @@ const ProfilePage = () => {
                     </p>
                   </div>
                   
-                  <div className="h-48">
+                  <div className="h-40 sm:h-48">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
