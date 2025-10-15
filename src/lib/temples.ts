@@ -4,6 +4,7 @@ export type NeededItem = {
   quantity: number;
   remaining: number;
   stores: string[];
+  price?: number; // ราคา/ชิ้น สำหรับแสดงผล
 };
 
 export type Temple = {
@@ -25,10 +26,10 @@ export const templesData: Temple[] = [
     raised: 245000,
     goal: 500000,
     neededItems: [
-      { id: 1, name: "สบู่เหลวอาบน้ำ 500ml", quantity: 40, remaining: 28, stores: ["ตลาดวโรรส", "ร้านของชำชุมชน", "แม็คโคร เชียงใหม่"] },
-      { id: 2, name: "แชมพู 500ml", quantity: 40, remaining: 30, stores: ["ตลาดวโรรส", "บิ๊กซี เชียงใหม่"] },
-      { id: 7, name: "ยาสีฟัน 150g", quantity: 60, remaining: 45, stores: ["ร้านขายยาท้องถิ่น", "โลตัส เชียงใหม่"] },
-      { id: 8, name: "ข้าวสาร 5 กก.", quantity: 50, remaining: 37, stores: ["แม็คโคร เชียงใหม่", "ตลาดชุมชน"] },
+      { id: 1, name: "สบู่เหลวอาบน้ำ 500ml", quantity: 40, remaining: 28, stores: ["ตลาดวโรรส", "ร้านของชำชุมชน", "แม็คโคร เชียงใหม่"], price: 59 },
+      { id: 2, name: "แชมพู 500ml", quantity: 40, remaining: 30, stores: ["ตลาดวโรรส", "บิ๊กซี เชียงใหม่"], price: 89 },
+      { id: 7, name: "ยาสีฟัน 150g", quantity: 60, remaining: 45, stores: ["ร้านขายยาท้องถิ่น", "โลตัส เชียงใหม่"], price: 49 },
+      { id: 8, name: "ข้าวสาร 5 กก.", quantity: 50, remaining: 37, stores: ["แม็คโคร เชียงใหม่", "ตลาดชุมชน"], price: 135 },
     ],
   },
   {
@@ -39,10 +40,10 @@ export const templesData: Temple[] = [
     raised: 180000,
     goal: 300000,
     neededItems: [
-      { id: 3, name: "ข้าวสาร", quantity: 50, remaining: 32, stores: ["แม็คโคร", "โลตัส"] },
-      { id: 4, name: "น้ำมันพืช", quantity: 30, remaining: 22, stores: ["แม็คโคร", "โลตัส"] },
-      { id: 9, name: "ปลากระป๋อง", quantity: 100, remaining: 76, stores: ["แม็คโคร", "โลตัส"] },
-      { id: 10, name: "ยาสามัญประจำวัด", quantity: 25, remaining: 20, stores: ["ร้านขายยา"] },
+      { id: 3, name: "ข้าวสาร", quantity: 50, remaining: 32, stores: ["แม็คโคร", "โลตัส"], price: 120 },
+      { id: 4, name: "น้ำมันพืช", quantity: 30, remaining: 22, stores: ["แม็คโคร", "โลตัส"], price: 55 },
+      { id: 9, name: "ปลากระป๋อง", quantity: 100, remaining: 76, stores: ["แม็คโคร", "โลตัส"], price: 28 },
+      { id: 10, name: "ยาสามัญประจำวัด", quantity: 25, remaining: 20, stores: ["ร้านขายยา"], price: 199 },
     ],
   },
   {
@@ -53,10 +54,10 @@ export const templesData: Temple[] = [
     raised: 120000,
     goal: 400000,
     neededItems: [
-      { id: 5, name: "ซีเมนต์", quantity: 80, remaining: 64, stores: ["ห้างไทวัสดุ", "โฮมโปร"] },
-      { id: 6, name: "สีทาอาคาร", quantity: 40, remaining: 28, stores: ["ห้างไทวัสดุ", "TOA Paint"] },
-      { id: 11, name: "ทรายหยาบ", quantity: 100, remaining: 90, stores: ["ร้านวัสดุก่อสร้าง"] },
-      { id: 12, name: "เหล็กเส้น 12 มม.", quantity: 60, remaining: 50, stores: ["ร้านเหล็ก"] },
+      { id: 5, name: "ซีเมนต์", quantity: 80, remaining: 64, stores: ["ห้างไทวัสดุ", "โฮมโปร"], price: 145 },
+      { id: 6, name: "สีทาอาคาร", quantity: 40, remaining: 28, stores: ["ห้างไทวัสดุ", "TOA Paint"], price: 320 },
+      { id: 11, name: "ทรายหยาบ", quantity: 100, remaining: 90, stores: ["ร้านวัสดุก่อสร้าง"], price: 600 },
+      { id: 12, name: "เหล็กเส้น 12 มม.", quantity: 60, remaining: 50, stores: ["ร้านเหล็ก"], price: 210 },
     ],
   },
   {
@@ -67,10 +68,10 @@ export const templesData: Temple[] = [
     raised: 95000,
     goal: 220000,
     neededItems: [
-      { id: 13, name: "สบู่ก้อน", quantity: 120, remaining: 85, stores: ["แม็คโคร", "โลตัส"] },
-      { id: 14, name: "ยาสีฟัน", quantity: 100, remaining: 70, stores: ["บิ๊กซี", "โลตัส"] },
-      { id: 15, name: "กระดาษชำระ", quantity: 80, remaining: 60, stores: ["แม็คโคร", "โฮมโปร"] },
-      { id: 16, name: "น้ำดื่มแพ็ค", quantity: 60, remaining: 44, stores: ["แม็คโคร"] },
+      { id: 13, name: "สบู่ก้อน", quantity: 120, remaining: 85, stores: ["แม็คโคร", "โลตัส"], price: 15 },
+      { id: 14, name: "ยาสีฟัน", quantity: 100, remaining: 70, stores: ["บิ๊กซี", "โลตัส"], price: 49 },
+      { id: 15, name: "กระดาษชำระ", quantity: 80, remaining: 60, stores: ["แม็คโคร", "โฮมโปร"], price: 120 },
+      { id: 16, name: "น้ำดื่มแพ็ค", quantity: 60, remaining: 44, stores: ["แม็คโคร"], price: 60 },
     ],
   },
   {
@@ -81,10 +82,10 @@ export const templesData: Temple[] = [
     raised: 140000,
     goal: 350000,
     neededItems: [
-      { id: 17, name: "ผงซักฟอก", quantity: 50, remaining: 38, stores: ["แม็คโคร", "โลตัส"] },
-      { id: 18, name: "น้ำยาถูพื้น", quantity: 40, remaining: 29, stores: ["บิ๊กซี", "โฮมโปร"] },
-      { id: 19, name: "ผ้าเช็ดตัว", quantity: 60, remaining: 45, stores: ["โลตัส", "ห้างท้องถิ่น"] },
-      { id: 20, name: "ชุดปฐมพยาบาล", quantity: 20, remaining: 16, stores: ["ร้านขายยา"] },
+      { id: 17, name: "ผงซักฟอก", quantity: 50, remaining: 38, stores: ["แม็คโคร", "โลตัส"], price: 179 },
+      { id: 18, name: "น้ำยาถูพื้น", quantity: 40, remaining: 29, stores: ["บิ๊กซี", "โฮมโปร"], price: 99 },
+      { id: 19, name: "ผ้าเช็ดตัว", quantity: 60, remaining: 45, stores: ["โลตัส", "ห้างท้องถิ่น"], price: 79 },
+      { id: 20, name: "ชุดปฐมพยาบาล", quantity: 20, remaining: 16, stores: ["ร้านขายยา"], price: 259 },
     ],
   },
 ];

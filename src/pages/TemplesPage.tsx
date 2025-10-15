@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,26 @@ const TemplesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const temples = templesData;
+  const [extraByTemple, setExtraByTemple] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const read = () => {
+      const map: Record<string, number> = {};
+      for (const t of templesData) {
+        const k = `donation_total_temple_${t.id}`;
+        map[t.id] = Number(localStorage.getItem(k) || "0");
+      }
+      setExtraByTemple(map);
+    };
+    read();
+    const onAny = () => read();
+    window.addEventListener("storage", onAny);
+    window.addEventListener("donation-updated", onAny as any);
+    return () => {
+      window.removeEventListener("storage", onAny);
+      window.removeEventListener("donation-updated", onAny as any);
+    };
+  }, []);
 
   const filteredTemples = temples.filter((temple) =>
     temple.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -80,10 +100,10 @@ const TemplesPage = () => {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">ยอดบริจาค</span>
                     <span className="font-semibold text-primary">
-                      ฿{temple.raised.toLocaleString()} / ฿{temple.goal.toLocaleString()}
+                      ฿{(temple.raised + (extraByTemple[temple.id] || 0)).toLocaleString()} / ฿{temple.goal.toLocaleString()}
                     </span>
                   </div>
-                  <Progress value={(temple.raised / temple.goal) * 100} className="h-2" />
+                  <Progress value={((temple.raised + (extraByTemple[temple.id] || 0)) / temple.goal) * 100} className="h-2" />
                 </div>
 
                 <div>
