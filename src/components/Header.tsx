@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Church, Home, ListCollapse, HandHeart, User } from "lucide-react";
+import { Church, Home, ListCollapse, HandHeart, User, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Header = () => {
@@ -9,9 +9,10 @@ const Header = () => {
   
   const navItems = [
     { path: "/", icon: Home, label: "หน้าหลัก" },
-  { path: "/temples", icon: ListCollapse, label: "วัดทั้งหมด" },
-  { path: "/projects", icon: HandHeart, label: "โครงการ" },
+    { path: "/temples", icon: ListCollapse, label: "วัดทั้งหมด" },
+    { path: "/projects", icon: HandHeart, label: "โครงการ" },
     { path: "/fund", icon: HandHeart, label: "กองทุนรวม" },
+    { path: "/tracking", icon: ClipboardList, label: "ติดตามผล" },
     { path: "/profile", icon: User, label: "บัญชี" },
   ];
   
