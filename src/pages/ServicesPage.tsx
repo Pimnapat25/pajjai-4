@@ -258,12 +258,6 @@ const ServicesPage = () => {
                     </div>
                     
                     <div className="pt-4 border-t">
-                      <div className="mb-4">
-                        <p className="text-sm text-muted-foreground">งบประมาณโดยประมาณ</p>
-                        <p className="text-2xl font-bold text-primary">
-                          ฿{request.estimatedCost.toLocaleString()}
-                        </p>
-                      </div>
                       <div className="grid grid-cols-2 gap-2">
                         <Button 
                           variant="outline"
