@@ -9,6 +9,9 @@ import { MapPin, Share2, CheckCircle2, TrendingUp, Store, ArrowLeft } from "luci
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { templesData } from "@/lib/temples";
+import { ensureTempleItems, updateTempleItems, getTempleItems } from "@/lib/templeItems";
+import { insertDonation } from "@/lib/donations";
+import { toast } from "sonner";
 
 const expenseData = [
   { name: "ค่าน้ำไฟ", amount: 3200 },
@@ -37,7 +40,7 @@ const buildWishlist = (id: string | undefined) => {
     item: ni.name,
     total: ni.quantity,
     remaining: ni.remaining,
-    price: undefined as number | undefined,
+    price: ni.price,
     stores: ni.stores,
   }));
 };
@@ -57,10 +60,13 @@ const TemplePage = () => {
   }, [selectedItemsParam, selectedItem]);
 
   const itemsRefs = useRef<Record<number, HTMLDivElement | null>>({});
-  const wishlist = buildWishlist(id);
+  const [wishlist, setWishlist] = useState(buildWishlist(id));
   const [selectedStore, setSelectedStore] = useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<string>(selectedItem ?? "");
   const [cart, setCart] = useState<Record<string, number>>({});
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [customAmount, setCustomAmount] = useState<string>("");
+  const [isDonating, setIsDonating] = useState(false);
 
   const storeOptions = useMemo(() => {
     // Prefer stores from the chosen product; otherwise aggregate unique stores across wishlist
@@ -74,6 +80,17 @@ const TemplePage = () => {
 
   // Initialize cart and selected product from query params
   useEffect(() => {
+    // reset wishlist when id changes
+    setWishlist(buildWishlist(id));
+    // ensure temple_items rows exist (no-op if already there)
+    if (id) {
+      const items = buildWishlist(id).map((w) => ({ id: w.id, name: w.item, total: w.total, remaining: w.remaining, price: w.price }));
+      ensureTempleItems(id, items);
+      // read server remaining counts if available
+      getTempleItems(id).then((map) => {
+        setWishlist((prev) => prev.map((w) => ({ ...w, remaining: map[w.id] ?? w.remaining })));
+      }).catch(() => {});
+    }
     if (selectedItemsParam) {
       const next: Record<string, number> = {};
       selectedItemsParam.split(',').forEach((pair) => {
@@ -140,6 +157,91 @@ const TemplePage = () => {
   }, [selectedItemNames, wishlist]);
   
   const meta = getTempleMeta(id); 
+  const [extraRaised, setExtraRaised] = useState<number>(0);
+  useEffect(() => {
+    const read = () => {
+      const key = `donation_total_temple_${id ?? "unknown"}`;
+      setExtraRaised(Number(localStorage.getItem(key) || "0"));
+    };
+    read();
+    const onStorage = () => read();
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [id]);
+  const displayedRaised = (meta.raised ?? 0) + extraRaised;
+  const cartTotal = useMemo(() => {
+    return Object.entries(cart).reduce((sum, [name, qty]) => {
+      const it = wishlist.find(w => w.item === name);
+      const price = it?.price ?? 0;
+      return sum + (price * qty);
+    }, 0);
+  }, [cart, wishlist]);
+
+  const handleDonate = async (input?: number) => {
+    const hasCart = Object.keys(cart).length > 0 && cartTotal > 0;
+    const amountInput = hasCart ? cartTotal : (input ?? selectedAmount ?? Number(customAmount));
+    if (!amountInput || amountInput <= 0) return;
+    try {
+      setIsDonating(true);
+      await insertDonation({ category: `temple:${id ?? "unknown"}` , amount: amountInput });
+      toast.success("บริจาคสำเร็จ ขอบคุณครับ/ค่ะ");
+      // Update local displayed raised
+      setExtraRaised((v) => v + amountInput);
+
+      // If cart has specific items, decrement their remaining by qty
+      if (Object.keys(cart).length > 0) {
+        // Build DB updates before mutating state
+        const updates = wishlist.map((w) => {
+          const qty = cart[w.item] || 0;
+          if (qty <= 0) return null;
+          const newRemaining = Math.max(0, (w.remaining ?? 0) - qty);
+          return { id: w.id, remaining: newRemaining };
+        }).filter(Boolean) as Array<{ id: number; remaining: number }>;
+
+        setWishlist((prev) => prev.map((w) => {
+          const qty = cart[w.item] || 0;
+          if (qty <= 0) return w;
+          const newRemaining = Math.max(0, (w.remaining ?? 0) - qty);
+          return { ...w, remaining: newRemaining };
+        }));
+        if (id && updates.length > 0) {
+          updateTempleItems(id, updates);
+        }
+        setCart({});
+      } else {
+        // Spread custom amount across items with lowest remaining first
+        let budget = amountInput;
+        const sortedIdx = wishlist
+          .map((w, idx) => ({ idx, remaining: w.remaining ?? 0, price: w.price ?? 0 }))
+          .filter((x) => x.price > 0)
+          .sort((a, b) => a.remaining - b.remaining);
+        const next = [...wishlist];
+        const updates: Array<{ id: number; remaining: number }> = [];
+        for (const { idx, price } of sortedIdx) {
+          if (budget <= 0) break;
+          const w = next[idx];
+          const canBuy = Math.min(w.remaining ?? 0, Math.floor(budget / price));
+          if (canBuy > 0) {
+            const newRemaining = (w.remaining ?? 0) - canBuy;
+            next[idx] = { ...w, remaining: newRemaining };
+            updates.push({ id: w.id, remaining: newRemaining });
+            budget -= canBuy * price;
+          }
+        }
+        setWishlist(next);
+        if (id && updates.length > 0) {
+          updateTempleItems(id, updates);
+        }
+      }
+
+      setCustomAmount("");
+      setSelectedAmount(null);
+    } catch (e: any) {
+      toast.error(e?.message || "ไม่สามารถบันทึกการบริจาคได้");
+    } finally {
+      setIsDonating(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -248,9 +350,9 @@ const TemplePage = () => {
                     <div className="flex items-start justify-between">
                       <div>
                         <h4 className="font-semibold">{item.item}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          ราคา ฿{item.price} / ชิ้น
-                        </p>
+                        {item.price !== undefined && (
+                          <p className="text-sm text-muted-foreground">ราคา ฿{item.price} / ชิ้น</p>
+                        )}
                         {item.stores && item.stores.length > 0 && (
                           <p className="text-xs text-muted-foreground mt-1">
                             ซื้อได้ที่: {item.stores.join(", ")}
@@ -258,7 +360,7 @@ const TemplePage = () => {
                         )}
                       </div>
                       <Badge variant="secondary">
-                        เหลือ {item.remaining}/{item.total}
+                        เหลือ {Math.max(0, (item.total ?? 0) - (item.remaining ?? 0))}/{item.total}
                       </Badge>
                     </div>
                     <Progress 
@@ -316,20 +418,31 @@ const TemplePage = () => {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">ยอดบริจาค</span>
                     <span className="font-semibold text-primary">
-                      ฿{(meta.raised ?? 0).toLocaleString()} / ฿{(meta.goal ?? 0).toLocaleString()}
+                      ฿{displayedRaised.toLocaleString()} / ฿{(meta.goal ?? 0).toLocaleString()}
                     </span>
                   </div>
-                  <Progress value={meta.goal ? Math.min(100, ((meta.raised ?? 0) / (meta.goal ?? 1)) * 100) : 0} className="h-3" />
+                  <Progress value={meta.goal ? Math.min(100, (displayedRaised / (meta.goal ?? 1)) * 100) : 0} className="h-3" />
                   <p className="text-xs text-muted-foreground">
-                    {meta.goal ? `${Math.round(((meta.raised ?? 0) / (meta.goal ?? 1)) * 100)}% ของเป้าหมาย` : ""} • อีก 18 วัน
+                    {meta.goal ? `${Math.round((displayedRaised / (meta.goal ?? 1)) * 100)}% ของเป้าหมาย` : ""} • อีก 18 วัน
                   </p>
                 </div>
 
                 <div className="space-y-3">
                   <label className="text-sm font-medium">จำนวนเงิน</label>
+                  {Object.keys(cart).length > 0 && (
+                    <div className="text-sm text-muted-foreground">
+                      รวมมูลค่าตะกร้า: <span className="font-semibold text-primary">฿{cartTotal.toLocaleString()}</span>
+                    </div>
+                  )}
                   <div className="grid grid-cols-3 gap-2">
                     {[100, 300, 500].map((amount) => (
-                      <Button key={amount} variant="outline" size="sm">
+                      <Button
+                        key={amount}
+                        variant={selectedAmount === amount ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedAmount(amount)}
+                        disabled={isDonating}
+                      >
                         ฿{amount}
                       </Button>
                     ))}
@@ -338,6 +451,8 @@ const TemplePage = () => {
                     type="number"
                     placeholder="จำนวนอื่นๆ"
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    value={customAmount}
+                    onChange={(e) => setCustomAmount(e.target.value)}
                   />
                 </div>
 
@@ -365,7 +480,17 @@ const TemplePage = () => {
                   </label>
                 </div>
 
-                <Button className="w-full gradient-warm border-0 text-white hover:shadow-glow h-12">
+                <Button
+                  className="w-full gradient-warm border-0 text-white hover:shadow-glow h-12"
+                  onClick={() => handleDonate()}
+                  disabled={
+                    isDonating || (
+                      !(Object.keys(cart).length > 0 && cartTotal > 0) &&
+                      !selectedAmount &&
+                      (!customAmount || Number(customAmount) <= 0)
+                    )
+                  }
+                >
                   บริจาคตอนนี้
                 </Button>
 

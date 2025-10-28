@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,8 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { MapPin, Target, Search, Filter } from "lucide-react";
+import { insertDonation } from "@/lib/donations";
+import { toast } from "sonner";
 
 type ProjectDetail = {
   id: number;
@@ -158,6 +160,42 @@ const ProjectsPage = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const [donatingId, setDonatingId] = useState<number | null>(null);
+  const [extraByProject, setExtraByProject] = useState<Record<number, number>>({});
+
+  // Load extras from localStorage so displayed raised updates across refreshes
+  useEffect(() => {
+    const read = () => {
+      const map: Record<number, number> = {};
+      for (const p of projects) {
+        const k = `donation_total_project_${p.id}`;
+        map[p.id] = Number(localStorage.getItem(k) || "0");
+      }
+      setExtraByProject(map);
+    };
+    read();
+    const onAny = () => read();
+    window.addEventListener("storage", onAny);
+    window.addEventListener("donation-updated", onAny as any);
+    return () => {
+      window.removeEventListener("storage", onAny);
+      window.removeEventListener("donation-updated", onAny as any);
+    };
+  }, []);
+  const handleDonate = async (projId: number) => {
+    try {
+      setDonatingId(projId);
+      await insertDonation({ category: `project:${projId}`, amount: 100 });
+      toast.success("บริจาคโครงการสำเร็จ (ทดสอบ ฿100)");
+      // Do not mutate state here to avoid double increments; a 'donation-updated' event
+      // will trigger a re-read from localStorage and update exactly once.
+    } catch (e: any) {
+      toast.error(e?.message || "ไม่สามารถบันทึกการบริจาคได้");
+    } finally {
+      setDonatingId(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -211,7 +249,8 @@ const ProjectsPage = () => {
         {/* Projects Grid */}
   <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {filteredProjects.map((project) => {
-            const progress = (project.raised / project.goal) * 100;
+            const raised = project.raised + (extraByProject[project.id] || 0);
+            const progress = (raised / project.goal) * 100;
             const isCompleted = project.status === "completed";
             
             return (
@@ -252,7 +291,7 @@ const ProjectsPage = () => {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">ยอดสมทบทุน</span>
                       <span className="font-semibold text-primary">
-                        ฿{project.raised.toLocaleString()} / ฿{project.goal.toLocaleString()}
+                        ฿{(project.raised + (extraByProject[project.id] || 0)).toLocaleString()} / ฿{project.goal.toLocaleString()}
                       </span>
                     </div>
                     <Progress value={progress} className="h-2" />
@@ -332,7 +371,8 @@ const ProjectsPage = () => {
                 <CardFooter className="p-5 pt-0">
                   <Button 
                     className="w-full gradient-warm border-0 text-white hover:shadow-glow"
-                    disabled={isCompleted}
+                    disabled={isCompleted || donatingId === project.id}
+                    onClick={() => handleDonate(project.id)}
                   >
                     {isCompleted ? "โครงการสำเร็จแล้ว" : "ร่วมสมทบทุน"}
                   </Button>

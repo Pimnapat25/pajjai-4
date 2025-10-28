@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Lightbulb, Droplets, UtensilsCrossed, BookOpen, PiggyBank } from "lucide-react";
+import { insertDonation } from "@/lib/donations";
+import { toast } from "sonner";
 
 const FundPage = () => {
   const [customAmount, setCustomAmount] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isDonating, setIsDonating] = useState(false);
 
-  const categories = [
+  const [categories, setCategories] = useState([
     {
       id: "electricity",
       name: "ค่าไฟ",
@@ -47,14 +50,58 @@ const FundPage = () => {
       color: "text-purple-500",
       bgColor: "bg-purple-500/10",
     },
-  ];
+  ]);
 
   const totalRaised = categories.reduce((sum, cat) => sum + cat.raised, 0);
   const totalGoal = categories.reduce((sum, cat) => sum + cat.goal, 0);
 
-  const handleDonate = (amount: number) => {
-    console.log(`Donating ${amount} to ${selectedCategory || "general fund"}`);
-    // Here you would implement the actual donation logic
+  // Load persisted extras per category (so numbers don't reset on refresh)
+  useEffect(() => {
+    setCategories((prev) =>
+      prev.map((c) => {
+        const key = `donation_total_fund_cat_${c.id}`;
+        const extra = Number(localStorage.getItem(key) || "0");
+        return { ...c, raised: c.raised + extra };
+      })
+    );
+  }, []);
+
+  const handleDonate = async (amount: number) => {
+    if (!amount || amount <= 0) return;
+    const category = selectedCategory ?? "general";
+    try {
+      setIsDonating(true);
+      await insertDonation({ category, amount });
+
+      // Optimistic UI update
+      if (selectedCategory) {
+        setCategories((prev) =>
+          prev.map((c) => (c.id === selectedCategory ? { ...c, raised: c.raised + amount } : c))
+        );
+        try {
+          const key = `donation_total_fund_cat_${selectedCategory}`;
+          const cur = Number(localStorage.getItem(key) || "0");
+          localStorage.setItem(key, String(cur + amount));
+          window.dispatchEvent(new Event("donation-updated"));
+        } catch {}
+      } else {
+        // no specific category selected: distribute to first category for demo
+        setCategories((prev) => prev.map((c, i) => (i === 0 ? { ...c, raised: c.raised + amount } : c)));
+        try {
+          const key = `donation_total_fund_cat_${categories[0]?.id ?? "general"}`;
+          const cur = Number(localStorage.getItem(key) || "0");
+          localStorage.setItem(key, String(cur + amount));
+          window.dispatchEvent(new Event("donation-updated"));
+        } catch {}
+      }
+
+      toast.success("บริจาคสำเร็จ ขอบคุณครับ/ค่ะ");
+      setCustomAmount("");
+    } catch (e: any) {
+      toast.error(e?.message || "ไม่สามารถบันทึกการบริจาคได้");
+    } finally {
+      setIsDonating(false);
+    }
   };
 
   return (
@@ -162,6 +209,7 @@ const FundPage = () => {
                   variant="outline"
                   size="lg"
                   onClick={() => handleDonate(amount)}
+                  disabled={isDonating}
                   className="h-16 text-lg font-semibold hover:bg-primary hover:text-primary-foreground"
                 >
                   ฿{amount}
@@ -180,7 +228,7 @@ const FundPage = () => {
               <Button
                 size="lg"
                 onClick={() => handleDonate(Number(customAmount))}
-                disabled={!customAmount || Number(customAmount) <= 0}
+                disabled={!customAmount || Number(customAmount) <= 0 || isDonating}
         className="gradient-warm border-0 text-white px-8 w-full sm:w-auto"
               >
                 บริจาค

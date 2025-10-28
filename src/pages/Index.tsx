@@ -5,8 +5,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { DollarSign, Users, TrendingUp, HandHeart, PiggyBank } from "lucide-react";
+import { useEffect, useState } from "react";
+import { insertDonation } from "@/lib/donations";
+import { toast } from "sonner";
 
 const Index = () => {
+  // Base demo values
+  const baseRaised = 475200;
+  const goal = 1_000_000;
+  const [extraFund, setExtraFund] = useState(0);
+
+  useEffect(() => {
+    const read = () => setExtraFund(Number(localStorage.getItem("donation_total_fund") || "0"));
+    read();
+    const onStorage = () => read();
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const donateQuick = async (amount: number) => {
+    try {
+      await insertDonation({ category: "fund", amount });
+      toast.success("บริจาคกองทุนรวมสำเร็จ");
+      // reflect immediately in UI
+      setExtraFund((v) => v + amount);
+    } catch (e: any) {
+      toast.error(e?.message || "ไม่สามารถบันทึกการบริจาคได้");
+    }
+  };
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -76,23 +102,23 @@ const Index = () => {
               
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>฿475,200</span>
-                  <span>฿1,000,000</span>
+                  <span>฿{(baseRaised + extraFund).toLocaleString()}</span>
+                  <span>฿{goal.toLocaleString()}</span>
                 </div>
-                <Progress value={47.52} className="h-3 bg-white/30" />
+                <Progress value={Math.min(100, ((baseRaised + extraFund) / goal) * 100)} className="h-3 bg-white/30" />
               </div>
               
               <div className="flex flex-wrap gap-2 sm:gap-3">
-                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]">
+                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]" onClick={() => donateQuick(100)}>
                   ฿100
                 </Button>
-                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]">
+                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]" onClick={() => donateQuick(300)}>
                   ฿300
                 </Button>
-                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]">
+                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]" onClick={() => donateQuick(500)}>
                   ฿500
                 </Button>
-                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]">
+                <Button variant="secondary" size="sm" className="flex-1 min-w-[70px]" onClick={() => donateQuick(1000)}>
                   จำนวนอื่น
                 </Button>
               </div>
